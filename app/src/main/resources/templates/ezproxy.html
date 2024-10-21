@@ -1,0 +1,33 @@
+<html lang="en">
+    <head>
+        <title>EzProxy Log Uploader</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="icon" th:href="@{/icons/clipboard-regular.svg}">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+        <style>
+            p {
+                word-break: break-all;
+                white-space: pre-line;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>EzProxy Log Parsing Utility</h1>
+            <form class="row" method="POST" enctype="multipart/form-data" action="#" th:action="@{/ezproxy}" th:object="${fileModel}">
+                <div class="input-group mb-3">
+                    <input type="file" name="files" class="form-control" multiple/>
+                </div>
+                <div class="input-group mb-3">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+
+            <div th:if="${msg != null}">
+                <p th:utext="${msg}" style="font-family: monospace;"></p>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,304 @@
+<html lang="en">
+
+<head>
+    <title>Floor Occupancy Stats</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name=”apple-mobile-web-app-capable” content=”yes “>
+    <link rel="icon" th:href="@{/icons/clipboard-regular.svg}">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        .noise-card {
+            min-height: 120px;
+        }
+
+        @font-face {
+            font-family: "Circular";
+            src: url("/fonts/circular/CircularXX-Regular.otf");
+        }
+
+        @font-face {
+            font-family: "Circular";
+            src: url("/fonts/circular/CircularXX-Black.otf");
+            font-weight: bold;
+        }
+
+        body {
+            font-family: "Circular";
+        }
+
+        h4 {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container h-100">
+        <div class="row align-items-center h-100">
+            <div class="container">
+                <div class="row mt-3">
+                    <div class="col-lg-4">
+                        <img width="200px" th:src="@{/icons/brocku-lib-logo.png}"
+                            aria-label="Brock University Library logo" />
+                        <h4>Current Library Occupancy</h4>
+                    </div>
+                </div>
+                <div class="row justify-content-between">
+                    <div class="col-lg-6">
+                        <canvas id="chart" height="600"
+                            aria-label="A chart with information on how busy each floor and subsection of the library is. Right now "></canvas>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="row mt-3">
+                            <div class="text-center">
+                                <h4>Pick your favorite study spot in the library!</h4>
+                                <p>Scan this QR code or go to <a
+                                        href="http://rtod.library.brocku.ca:32777/busylib">http://rtod.library.brocku.ca:32777/busylib</a>,
+                                    and check from anywhere on the campus.</p>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center mt-3">
+                            <div class="col-lg-8 col-6">
+                                <img class="img-fluid" th:src="@{/icons/wifi-qr-code.svg}"
+                                    aria-label="QR code pointing towards http://rtod.library.brocku.ca:32777/busylib">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="text-center">
+                                <h6>Facing issues? Let us know at <a href="mailto:libsys@brocku.ca">libsys@brocku.ca</a>
+                                </h6>
+                            </div>
+                        </div>
+                        <!-- <div class="row mt-3">
+                            <div class="col-2">
+                                <button class="btn btn-danger d-block noise-card">
+                                    <img width="40px" th:src="@{/icons/volume-xmark-solid.svg}"/>
+                                </button>
+                            </div>
+                            <div class="col">
+                                Silent Study Zones : Floors 5 (Silent Room), 9, 10 & Classroom B (Main Floor)
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:src="@{/js/chart.min.js}"></script>
+    <script th:src="@{/js/datalabels.js}"></script>
+    <script>
+        const maxMap = {
+            2: 600,
+            3: 150,
+            4: 300,
+            5: 700,
+            6: 800,
+            7: 750,
+            8: 400,
+            9: 500,
+            10: 200,
+            11: 100,
+            12: 200,
+            20: 50,
+            30: 50
+        }
+
+        let jsonData = [(${ data })]["payload"]["records"];
+        const lastUpdatedOn = jsonData[0]["_start_date"];
+
+        if (jsonData.length > 12) {
+            jsonData = jsonData.splice(0, 12);
+        }
+
+        let dataMapped = jsonData.filter(e => (e["Floor"] != 3) && (e["Floor"] != 4) && (e["Floor"] != 11))
+            .sort((o1, o2) => o2["Floor"] - o1["Floor"])
+            .map(e => {
+                let label = "Floor " + e["Floor"];
+                switch (e["Floor"]) {
+                    case 2:
+                    case '2':
+                        label = "Learning Commons";
+                        break;
+                    case 20:
+                    case '20':
+                        label = "Makerspace";
+                        break;
+                    case 30:
+                    case '30':
+                        label = "MDGL";
+                        break;
+                }
+
+                let ratio = e["Count"] / maxMap[e["Floor"]];
+                ratio = (ratio < 0.12) ? 0.12 : ratio;
+                ratio = (ratio > 0.98) ? 0.98 : ratio;
+
+                return {
+                    "y": label,
+                    "ratio": ratio
+                }
+            });
+
+        dataMapped.push(dataMapped.shift());//Pushing MDGL to the end
+        dataMapped.push(dataMapped.shift());//Pushing Makerspace to the end
+
+        function interpolateColor(ratio) {
+            // Define soft shades of red and green
+            const softRed = { r: 255, g: 102, b: 102 };   // Soft red
+            const softGreen = { r: 102, g: 255, b: 102 }; // Soft green
+
+            // Calculate the interpolated color components
+            const red = Math.round(softRed.r * ratio + softGreen.r * (1 - ratio));
+            const green = Math.round(softRed.g * ratio + softGreen.g * (1 - ratio));
+            const blue = Math.round(softRed.b * ratio + softGreen.b * (1 - ratio));
+
+            // Format the RGB string
+            return `rgba(${red}, ${green}, ${blue}, 0.8)`;
+        }
+
+        let clonedData = JSON.parse(JSON.stringify(dataMapped));
+        clonedData = clonedData.map(e => {
+            e["ratio"] = 1.0;
+            return e;
+        });
+
+        const arbitraryLine = {
+            id: 'arbitraryLine',
+            afterDatasetsDraw(chart, args, plugins) {
+                const { ctx, scales: { y }, chartArea: { left, right } } = chart;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 1;
+
+                let midPoint = (y.getPixelForValue(5) + y.getPixelForValue(6)) / 2;
+
+                ctx.moveTo(left - 150, midPoint);
+                ctx.lineTo(right + 50, midPoint);
+                ctx.stroke();
+            }
+        }
+
+        const ctx = document.getElementById("chart").getContext("2d");
+        const myChart = new Chart(ctx, {
+            plugins: [ChartDataLabels, arbitraryLine],
+            type: 'bar',
+            data: {
+                datasets: [{
+                    label: "WiFi data",
+                    data: dataMapped,
+                    backgroundColor: (context) => interpolateColor(context.raw["ratio"]),
+                    hoverOffset: 4,
+                    categoryPercentage: 0.83
+                }, {
+                    label: 'Overlay',
+                    data: clonedData,
+                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                    borderColor: 'rgba(0, 0, 0, 0.5)',
+                    borderWidth: 2,
+                    hoverOffset: 4,
+                    categoryPercentage: 0.9
+                }]
+            },
+            options: {
+                parsing: {
+                    xAxisKey: "ratio"
+                },
+                maintainAspectRatio: false,
+                indexAxis: "y",
+                borderSkipped: false,
+                borderRadius: {
+                    topLeft: 20,
+                    topRight: 20,
+                    bottomLeft: 20,
+                    bottomRight: 20
+                },
+                plugins: {
+                    tooltip: {
+                        enabled: false
+                    },
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: "Last updated on: " + lastUpdatedOn,
+                        position: 'bottom'
+                    },
+                    datalabels: {
+                        formatter: (val, ctx) => {
+                            if (ctx.datasetIndex === 0) {
+                                let label = "As busy as it gets";
+
+                                if (val.ratio < 0.76) label = "Busy";
+                                if (val.ratio < 0.51) label = "A little busy";
+                                if (val.ratio < 0.25) label = "Not busy";
+
+                                document.getElementById("chart").ariaLabel = document.getElementById("chart").ariaLabel + (val["y"] + " is " + label + ". ");
+
+                                return label;
+                            }
+
+                            return "";
+                        },
+                        anchor: "start",
+                        align: "end",
+                        offset: 15,
+                        color: "rgb(0,0,0)",
+                        font: {
+                            size: 18,
+                            family: "Circular"
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 40,
+                        right: 20,
+                        top: 20,
+                        bottom: 20
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false
+                        },
+                        border: {
+                            display: false
+                        },
+                        ticks: {
+                            display: false
+                        },
+                        min: 0,
+                        max: 1
+                    },
+                    y: {
+                        stacked: "true",
+                        grid: {
+                            drawBorder: false,
+                            display: false
+                        },
+                        border: {
+                            display: false
+                        },
+                        ticks: {
+                            color: "rgb(0,0,0)",
+                            font: {
+                                size: 18,
+                                family: "Circular"
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
