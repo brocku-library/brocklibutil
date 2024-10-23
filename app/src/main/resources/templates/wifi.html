@@ -41,6 +41,10 @@
                     <div class="col-lg-4">
                         <img width="200px" th:src="@{/icons/brocku-lib-logo.png}"
                             aria-label="Brock University Library logo" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-7 text-center">
                         <h4>Current Library Occupancy</h4>
                     </div>
                 </div>
@@ -52,8 +56,8 @@
                     <div class="col-lg-4">
                         <div class="row mt-3">
                             <div class="text-center">
-                                <h4>Pick your favorite study spot in the library!</h4>
-                                <p>Scan this QR code or go to <a
+                                <h4>Check how busy we are from anywhere on campus!</h4>
+                                <p>Scan this QR code or go to <br/> <a
                                         href="http://rtod.library.brocku.ca:32777/busylib">http://rtod.library.brocku.ca:32777/busylib</a>,
                                     and check from anywhere on the campus.</p>
                             </div>
@@ -175,9 +179,14 @@
                 ctx.strokeStyle = 'black';
                 ctx.lineWidth = 1;
 
-                let midPoint = (y.getPixelForValue(5) + y.getPixelForValue(6)) / 2;
+                let midPoint = (y.getPixelForValue(6) + y.getPixelForValue(7)) / 2;
 
-                ctx.moveTo(left - 150, midPoint);
+                ctx.moveTo(left - 200, midPoint);
+                ctx.lineTo(right + 50, midPoint);
+                ctx.stroke();
+
+                midPoint = (y.getPixelForValue(7) + y.getPixelForValue(8)) / 2;
+                ctx.moveTo(left - 200, midPoint);
                 ctx.lineTo(right + 50, midPoint);
                 ctx.stroke();
             }
@@ -191,7 +200,15 @@
                 datasets: [{
                     label: "WiFi data",
                     data: dataMapped,
-                    backgroundColor: (context) => interpolateColor(context.raw["ratio"]),
+                    backgroundColor: (context) => {
+                        let color = "rgba(245, 0, 0, 0.8)";
+
+                        if (context.raw["ratio"] < 0.76) color = "rgba(245, 120, 0, 0.8)";
+                        if (context.raw["ratio"] < 0.51) color = "rgba(245, 245, 80, 0.8)";
+                        if (context.raw["ratio"] < 0.25) color = "rgba(100, 245, 0, 0.8)";
+                        
+                        return color;
+                    },
                     hoverOffset: 4,
                     categoryPercentage: 0.83
                 }, {
@@ -208,6 +225,7 @@
                 parsing: {
                     xAxisKey: "ratio"
                 },
+                hover: {mode: null},
                 maintainAspectRatio: false,
                 indexAxis: "y",
                 borderSkipped: false,
