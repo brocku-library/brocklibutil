@@ -30,18 +30,11 @@ public class EzProxyLibinsightController {
     @Autowired
     private FileProcessingService fileProcessingService;
 
-    // @GetMapping
     public String ezproxyDump(@RequestParam String pin, Model model) {
         model.addAttribute("fileModel", new EzProxyMultipartFiles());
-
-        if (!"wubalubadubdub".equals(pin)) {
-            return null;
-        }
-
         return "ezproxy";
     }
 
-    // @PostMapping
     public String getFiles(@ModelAttribute EzProxyMultipartFiles fileModel, RedirectAttributes redirectAttributes)
             throws JsonProcessingException {
 
@@ -52,7 +45,7 @@ public class EzProxyLibinsightController {
             redirectAttributes.addFlashAttribute("msg", "Failed. Talk to the developer.");
         }
 
-        return "redirect:/ezproxy?pin=wubalubadubdub";
+        return "redirect:/ezproxy";
     }
 
     @PostMapping("/upload")
