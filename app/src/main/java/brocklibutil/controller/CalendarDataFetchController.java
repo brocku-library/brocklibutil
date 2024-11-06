@@ -43,6 +43,7 @@ public class CalendarDataFetchController {
     String viewEvents(@RequestParam Location location, ModelMap model) throws Exception {
         model.put("eventRunning", eventRunningNow(location));
         model.put("eventsToday", allEventTime(location));
+        model.put("location", location);
 
         return "calevents";
     }

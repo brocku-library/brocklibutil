@@ -20,6 +20,9 @@
     <div class="container h-100">
         <div class="row align-items-center h-100">
             <div class="d-flex flex-column">
+                <div class="p-2 text-center">
+                    <h5 class="display-5" th:text="${location.title}"></h5>
+                </div>
                 <div class="p-2 text-center" th:switch="${eventRunning == null}">
                     <h2 th:case="true" class="alert alert-success">Room is available right now</h2>
                     <h2 th:case="false" class="alert alert-danger">Reserved until [(${eventRunning.endDateTimeStr})]</h2>
