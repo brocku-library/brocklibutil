@@ -40,10 +40,19 @@ public class CalendarDataFetchController {
     CalendarDataFetchService cDataFetchService;
 
     @GetMapping
-    String viewEvents(@RequestParam Location location, ModelMap model) throws Exception {
-        model.put("eventRunning", eventRunningNow(location));
-        model.put("eventsToday", allEventTime(location));
-        model.put("location", location);
+    String viewEvents(@RequestParam(value = "location") List<Location> locations, ModelMap model) {
+        List<EmbeddedLocationInfo> allLocationInfos = locations.stream()
+                .map(location -> {
+                    try {
+                        return new EmbeddedLocationInfo(location, eventRunningNow(location), allEventTime(location));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        model.put("allLocationInfos", allLocationInfos);
 
         return "calevents";
     }
@@ -109,5 +118,30 @@ public class CalendarDataFetchController {
     @Scheduled(fixedRateString = "${caching.ttl}")
     public void emptyCache() {
         logger.info("Calendar data cache cleared");
+    }
+
+    public class EmbeddedLocationInfo {
+
+        private Location location;
+        private Event runningEvent;
+        private List<Event> upcomingEvents;
+
+        public EmbeddedLocationInfo(Location location, Event runningEvent, List<Event> upcomingEvents) {
+            this.location = location;
+            this.runningEvent = runningEvent;
+            this.upcomingEvents = upcomingEvents;
+        }
+
+        public Location getLocation() {
+            return location;
+        }
+
+        public Event getRunningEvent() {
+            return runningEvent;
+        }
+
+        public List<Event> getUpcomingEvents() {
+            return upcomingEvents;
+        }
     }
 }
