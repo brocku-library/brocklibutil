@@ -64,7 +64,7 @@ public class WifiLibinsightController {
     }
 
     @CacheEvict(value = "responseLib", allEntries = true)
-    @Scheduled(fixedRateString = "${caching.ttl}")
+    @Scheduled(fixedRateString = "${caching.ttl.wifi}")
     public void emptyCache() {
         logger.info("Libinsight data cache cleared");
     }
