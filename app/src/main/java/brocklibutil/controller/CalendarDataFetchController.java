@@ -117,7 +117,7 @@ public class CalendarDataFetchController {
     @CacheEvict(value = "caldata", allEntries = true)
     @Scheduled(fixedRateString = "${caching.ttl.cal}")
     public void emptyCache() {
-        logger.info("Calendar data cache cleared");
+        logger.debug("Calendar data cache cleared");
     }
 
     public class EmbeddedLocationInfo {

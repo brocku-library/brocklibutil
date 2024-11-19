@@ -4,7 +4,7 @@
     <title>Room Booking Status</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name=”apple-mobile-web-app-capable” content=”yes “>
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="icon" th:href="@{/icons/clipboard-regular.svg}">
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" crossorigin="anonymous">
 </head>
@@ -57,10 +57,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div th:if="${locationInfo.location.qrCodeURI}">
-                                <div class="row justify-content-center">
-                                    <div class="col-12">
+                        <div class="col-3" th:if="${locationInfo.location.qrCodeURI}" >
+                            <div class="container d-flex h-100" style="padding: 0;">
+                                <div class="row align-items-center">
+                                    <div class="col-12" style="padding: 0;">
                                         <img class="img-fluid" th:src="${locationInfo.location.qrCodeURI}"
                                             aria-label="QR code pointing towards ${locationInfo.location.qrCodeURI}">
                                     </div>
