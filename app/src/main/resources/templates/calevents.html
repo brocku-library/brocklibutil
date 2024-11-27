@@ -27,37 +27,40 @@
                             <div class="p-2 text-center" th:switch="${locationInfo.runningEvent == null}">
                                 <h2 th:case="true" class="alert alert-success">Room is available right now</h2>
                                 <h2 th:case="false" class="alert alert-danger">Reserved until
-                                    [(${locationInfo.runningEvent.endDateTimeStr})]</h2>
+                                    <strong>[(${locationInfo.runningEvent.endDateTimeStr})]</strong></h2>
+                            </div>
+
+                            <div class="p-2 text-center" th:if="${locationInfo.exactNextEvent != null}">
+                                <h5 class="alert alert-warning" style="display:inline-block;">Next booking is at
+                                    <strong>[(${locationInfo.exactNextEvent.startDateTimeStr})]</strong>.
+                                    You maybe asked to leave at that time.</h5>
                             </div>
 
                             <div class="p-2">
                                 <h4 class="text-center" th:if="${not #lists.isEmpty(locationInfo.upcomingEvents)}">
-                                    Upcoming reservations</h4>
+                                    Other bookings today</h4>
                                 <div class="text-center" th:if="${#lists.isEmpty(locationInfo.upcomingEvents)}">No more
-                                    scheduled events
-                                    today.</div>
+                                    scheduled events today</div>
 
                                 <div class="row justify-content-md-center">
                                     <div class="col-md-6">
                                         <table class="table" th:if="${not #lists.isEmpty(locationInfo.upcomingEvents)}">
-                                            <tbody>
-                                                <thead>
-                                                    <th class="text-center">Starts at</th>
-                                                    <th class="text-center">Ends at</th>
-                                                </thead>
+                                            <thead>
+                                                <th class="text-center">Starts at</th>
+                                                <th class="text-center">Ends at</th>
+                                            </thead>
                                             <tbody>
                                                 <tr th:each="event: ${locationInfo.upcomingEvents}">
                                                     <td th:text="${event.startDateTimeStr}" class="text-center"></td>
                                                     <td th:text="${event.endDateTimeStr}" class="text-center"></td>
                                                 </tr>
                                             </tbody>
-                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-3" th:if="${locationInfo.location.qrCodeURI}" >
+                        <div class="col-3" th:if="${locationInfo.location.qrCodeURI}">
                             <div class="container d-flex h-100" style="padding: 0;">
                                 <div class="row align-items-center">
                                     <div class="col-12" style="padding: 0;">

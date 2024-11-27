@@ -124,12 +124,20 @@ public class CalendarDataFetchController {
 
         private Location location;
         private Event runningEvent;
+        private Event exactNextEvent;
         private List<Event> upcomingEvents;
 
         public EmbeddedLocationInfo(Location location, Event runningEvent, List<Event> upcomingEvents) {
             this.location = location;
             this.runningEvent = runningEvent;
-            this.upcomingEvents = upcomingEvents;
+
+            if (upcomingEvents.size() != 0) {
+                this.exactNextEvent = upcomingEvents.get(0);
+            }
+
+            this.upcomingEvents = upcomingEvents.size() > 1
+                    ? upcomingEvents.subList(1, upcomingEvents.size())
+                    : null;
         }
 
         public Location getLocation() {
@@ -138,6 +146,10 @@ public class CalendarDataFetchController {
 
         public Event getRunningEvent() {
             return runningEvent;
+        }
+
+        public Event getExactNextEvent() {
+            return exactNextEvent;
         }
 
         public List<Event> getUpcomingEvents() {
