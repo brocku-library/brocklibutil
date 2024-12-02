@@ -17,7 +17,7 @@ public class CalendarDataFetchService {
 
     @Cacheable("caldata")
     public Calendar getCalendar(Location location) throws Exception {
-        logger.info("Fetching calendar data");
+        logger.debug("Fetching calendar data");
 
         InputStream fis = new URI(location.getURI()).toURL().openStream();
         CalendarBuilder builder = new CalendarBuilder();
