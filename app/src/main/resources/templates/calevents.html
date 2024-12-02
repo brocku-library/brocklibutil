@@ -31,14 +31,14 @@
                             </div>
 
                             <div class="p-2 text-center" th:if="${locationInfo.exactNextEvent != null}">
-                                <h5 class="alert alert-warning" style="display:inline-block;">Next booking is at
+                                <h6 class="text-danger" style="display:inline-block;">Next booking is at
                                     <strong>[(${locationInfo.exactNextEvent.startDateTimeStr})]</strong>.
-                                    You maybe asked to leave at that time.</h5>
+                                    You maybe asked to leave at that time.</h6>
                             </div>
 
                             <div class="p-2">
-                                <h4 class="text-center" th:if="${not #lists.isEmpty(locationInfo.upcomingEvents)}">
-                                    Other bookings today</h4>
+                                <h5 class="text-center" th:if="${not #lists.isEmpty(locationInfo.upcomingEvents)}">
+                                    Other bookings today</h5>
                                 <div class="text-center" th:if="${#lists.isEmpty(locationInfo.upcomingEvents)}">No more
                                     scheduled events today</div>
 
