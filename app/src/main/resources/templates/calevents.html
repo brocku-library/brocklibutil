@@ -7,6 +7,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="icon" th:href="@{/icons/clipboard-regular.svg}">
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        .next-booking {
+            display: inline-block;
+            padding: 0.2rem;
+        }
+    </style>
 </head>
 
 <body>
@@ -31,28 +37,28 @@
                             </div>
 
                             <div class="p-2 text-center" th:if="${locationInfo.exactNextEvent != null}">
-                                <h6 class="text-danger" style="display:inline-block;">Next booking is at
+                                <h6 class="alert alert-warning next-booking">Next booking is at
                                     <strong>[(${locationInfo.exactNextEvent.startDateTimeStr})]</strong>.
                                     You maybe asked to leave at that time.</h6>
                             </div>
 
                             <div class="p-2">
-                                <h5 class="text-center" th:if="${not #lists.isEmpty(locationInfo.upcomingEvents)}">
-                                    Other bookings today</h5>
-                                <div class="text-center" th:if="${#lists.isEmpty(locationInfo.upcomingEvents)}">No more
-                                    scheduled events today</div>
+                                <h6 class="text-center" th:if="${not #lists.isEmpty(locationInfo.upcomingEvents)}">
+                                    <strong>Other bookings today</strong></h6>
+                                <h6 class="text-center" th:if="${#lists.isEmpty(locationInfo.upcomingEvents)}">No more
+                                    scheduled events today</h6>
 
                                 <div class="row justify-content-md-center">
                                     <div class="col-md-6">
                                         <table class="table" th:if="${not #lists.isEmpty(locationInfo.upcomingEvents)}">
                                             <thead>
-                                                <th class="text-center">Starts at</th>
-                                                <th class="text-center">Ends at</th>
+                                                <th class="text-center h6">Starts at</th>
+                                                <th class="text-center h6">Ends at</th>
                                             </thead>
                                             <tbody>
                                                 <tr th:each="event: ${locationInfo.upcomingEvents}">
-                                                    <td th:text="${event.startDateTimeStr}" class="text-center"></td>
-                                                    <td th:text="${event.endDateTimeStr}" class="text-center"></td>
+                                                    <td th:text="${event.startDateTimeStr}" class="text-center h6"></td>
+                                                    <td th:text="${event.endDateTimeStr}" class="text-center h6"></td>
                                                 </tr>
                                             </tbody>
                                         </table>
