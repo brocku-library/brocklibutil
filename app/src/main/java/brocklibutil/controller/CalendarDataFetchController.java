@@ -14,13 +14,12 @@ import org.springframework.ui.ModelMap;
 import brocklibutil.domain.Location;
 import brocklibutil.service.CalendarDataFetchService;
 import brocklibutil.domain.Event;
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -68,8 +67,14 @@ public class CalendarDataFetchController {
                     DtEnd temporalEndDate = (DtEnd) comp.getProperty(Property.DTEND).get();
                     boolean isAllDayEvent = Boolean.valueOf(comp.getProperty(ALL_DAY_EVENT_TAG).get().getValue());
 
-                    Temporal temporalStart = temporalStartDate.getDate();
-                    Temporal temporalEnd = temporalEndDate.getDate();
+                    Temporal temporalStart, temporalEnd;
+                    try {
+                        temporalStart = temporalStartDate.getDate();
+                        temporalEnd = temporalEndDate.getDate();
+                    } catch (DateTimeException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
 
                     ZonedDateTime startDateTime = isAllDayEvent
                             ? LocalDate.from(temporalStart).atStartOfDay(ZoneId.of("US/Eastern"))
@@ -81,6 +86,7 @@ public class CalendarDataFetchController {
 
                     return new Event(startDateTime, endDateTime);
                 })
+                .filter(e -> e != null)
                 .filter(e -> now.isAfter(e.getStartDateTime()) && now.isBefore(e.getEndDateTime()))
                 .findFirst()
                 .orElse(null);
@@ -105,10 +111,16 @@ public class CalendarDataFetchController {
                                         .atZone(ZoneId.of("US/Eastern")));
                     }
 
-                    return new Event(
-                            ZonedDateTime.from(temporalStartDate.getDate()),
-                            ZonedDateTime.from(temporalEndDate.getDate()));
+                    try {
+                        return new Event(
+                                ZonedDateTime.from(temporalStartDate.getDate()),
+                                ZonedDateTime.from(temporalEndDate.getDate()));
+                    } catch (DateTimeException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
                 })
+                .filter(e -> e != null)
                 .filter(dt -> dt.getStartDateTime().isAfter(now) && dt.getEndDateTime().isBefore(now.plusHours(14)))
                 .sorted((d1, d2) -> d1.getStartDateTime().compareTo(d2.getStartDateTime()))
                 .collect(Collectors.toList());
