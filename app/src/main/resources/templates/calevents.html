@@ -8,7 +8,7 @@
     <link rel="icon" th:href="@{/icons/clipboard-regular.svg}">
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" crossorigin="anonymous">
     <style>
-        .next-booking {
+        .tight-wrapped-alert {
             display: inline-block;
             padding: 0.2rem;
         }
@@ -31,15 +31,16 @@
                     <div class="row">
                         <div th:class="${locationInfo.location.qrCodeURI != null ? 'col-9' : 'col-12'}">
                             <div class="p-2 text-center" th:switch="${locationInfo.runningEvent == null}">
-                                <h2 th:case="true" class="alert alert-success">Room is available right now</h2>
-                                <h2 th:case="false" class="alert alert-danger">Reserved until
-                                    <strong>[(${locationInfo.runningEvent.endDateTimeStr})]</strong></h2>
+                                <h5 th:case="true" th:class="${locationInfo.location.qrCodeURI == null ? 'alert alert-success tight-wrapped-alert' : 'alert alert-success'}">Room is available right now</h5>
+                                <h5 th:case="false" th:class="${locationInfo.location.qrCodeURI == null ? 'alert alert-danger tight-wrapped-alert' : 'alert alert-danger'}">Reserved until
+                                    <strong>[(${locationInfo.runningEvent.endDateTimeStr})]</strong></h5>
                             </div>
 
                             <div class="p-2 text-center" th:if="${locationInfo.exactNextEvent != null}">
-                                <h6 class="alert alert-warning next-booking">Next booking is at
-                                    <strong>[(${locationInfo.exactNextEvent.startDateTimeStr})]</strong>.
-                                    You maybe asked to leave at that time.</h6>
+                                <h5 th:class="${locationInfo.location.qrCodeURI == null ? 'alert alert-warning' : 'alert alert-warning tight-wrapped-alert'}">
+                                    Next booking:
+                                    <strong>[(${locationInfo.exactNextEvent.startDateTimeStr})] - [(${locationInfo.exactNextEvent.startDateTimeStr})].</strong>.
+                                    You may be asked to leave at that time.</h5>
                             </div>
 
                             <div class="p-2">
