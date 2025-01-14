@@ -39,7 +39,7 @@
                             <div class="p-2 text-center" th:if="${locationInfo.exactNextEvent != null}">
                                 <h5 th:class="${locationInfo.location.qrCodeURI == null ? 'alert alert-warning' : 'alert alert-warning tight-wrapped-alert'}">
                                     Next booking:
-                                    <strong>[(${locationInfo.exactNextEvent.startDateTimeStr})] - [(${locationInfo.exactNextEvent.startDateTimeStr})].</strong>.
+                                    <strong>[(${locationInfo.exactNextEvent.startDateTimeStr})] - [(${locationInfo.exactNextEvent.endDateTimeStr})]</strong>.
                                     You may be asked to leave at that time.</h5>
                             </div>
 

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -45,6 +46,9 @@
                     <div class="col-lg-4 align-self-center">
                         <h4>Current Library Occupancy</h4>
                     </div>
+                </div>
+                <div class="row">
+                    <h5 id="countText" style="padding-top: 30px;"></h5>
                 </div>
                 <div class="row justify-content-between">
                     <div class="col-lg-12">
@@ -104,6 +108,16 @@
         if (jsonData.length > 12) {
             jsonData = jsonData.splice(0, 12);
         }
+
+        let patronCount = jsonData.filter(e => (e["Floor"] != 3) && (e["Floor"] != 4) && (e["Floor"] != 11) && (e["Floor"] < 15))
+            .map(e => {
+                let count = e["Count"];
+                let currentHour = new Date().getHours();
+
+                return (currentHour < 11) ? (count / 1.7) : (count / 2.0);
+            }).reduce((sum, num) => sum + num, 0);
+        
+        document.getElementById("countText").textContent = "Approximately " + patronCount + " patrons in James A. Gibson.";
 
         let dataMapped = jsonData.filter(e => (e["Floor"] != 3) && (e["Floor"] != 4) && (e["Floor"] != 11))
             .sort((o1, o2) => o2["Floor"] - o1["Floor"])

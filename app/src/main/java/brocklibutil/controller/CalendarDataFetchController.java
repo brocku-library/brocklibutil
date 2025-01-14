@@ -15,6 +15,7 @@ import brocklibutil.domain.Location;
 import brocklibutil.service.CalendarDataFetchService;
 import brocklibutil.domain.Event;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
@@ -45,7 +46,7 @@ public class CalendarDataFetchController {
                     try {
                         return new EmbeddedLocationInfo(location, eventRunningNow(location), allEventTime(location));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                         return null;
                     }
                 })
@@ -72,7 +73,7 @@ public class CalendarDataFetchController {
                         temporalStart = temporalStartDate.getDate();
                         temporalEnd = temporalEndDate.getDate();
                     } catch (DateTimeException e) {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                         return null;
                     }
 
@@ -116,7 +117,7 @@ public class CalendarDataFetchController {
                                 ZonedDateTime.from(temporalStartDate.getDate()),
                                 ZonedDateTime.from(temporalEndDate.getDate()));
                     } catch (DateTimeException e) {
-                        e.printStackTrace();
+                        // comp.getPropertyList().getAll().forEach(System.out::println);
                         return null;
                     }
                 })
