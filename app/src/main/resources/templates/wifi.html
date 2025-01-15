@@ -126,7 +126,7 @@
                 switch (e["Floor"]) {
                     case 2:
                     case '2':
-                        label = "Learning Commons";
+                        label = "  Learning Commons"; // Two spaces at the front is basically to fix a weird problem with chart.js, that crops the leading `L` in the first load.
                         break;
                     case 20:
                     case '20':
@@ -199,29 +199,32 @@
             plugins: [ChartDataLabels, arbitraryLine],
             type: 'bar',
             data: {
-                datasets: [{
-                    label: "WiFi data",
-                    data: dataMapped,
-                    backgroundColor: (context) => {
-                        let color = "rgba(245, 0, 0, 0.8)";
-
-                        if (context.raw["ratio"] < 0.76) color = "rgba(245, 120, 0, 0.8)";
-                        if (context.raw["ratio"] < 0.51) color = "rgba(245, 245, 80, 0.8)";
-                        if (context.raw["ratio"] < 0.25) color = "rgba(100, 245, 0, 0.8)";
-                        
-                        return color;
+                datasets: [
+                    {
+                        label: 'Overlay',
+                        data: clonedData,
+                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                        borderColor: 'rgba(128, 128, 128, 1)',
+                        borderWidth: 2,
+                        hoverOffset: 3,
+                        categoryPercentage: 0.9
                     },
-                    hoverOffset: 4,
-                    categoryPercentage: 0.83
-                }, {
-                    label: 'Overlay',
-                    data: clonedData,
-                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                    borderColor: 'rgba(0, 0, 0, 0.5)',
-                    borderWidth: 2,
-                    hoverOffset: 4,
-                    categoryPercentage: 0.9
-                }]
+                    {
+                        label: "WiFi data",
+                        data: dataMapped,
+                        backgroundColor: (context) => {
+                            let color = "rgba(245, 0, 0, 0.8)";
+
+                            if (context.raw["ratio"] < 0.76) color = "rgba(245, 120, 0, 0.8)";
+                            if (context.raw["ratio"] < 0.51) color = "rgba(245, 245, 80, 0.8)";
+                            if (context.raw["ratio"] < 0.25) color = "rgba(100, 245, 0, 0.8)";
+
+                            return color;
+                        },
+                        hoverOffset: 4,
+                        categoryPercentage: 0.83
+                    }
+                ]
             },
             options: {
                 parsing: {
