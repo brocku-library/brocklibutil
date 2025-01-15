@@ -35,8 +35,8 @@
 </head>
 
 <body>
-    <div class="container h-100">
-        <div class="row align-items-center h-100">
+    <div class="container vh-100">
+        <div class="row align-items-center vh-100">
             <div class="container">
                 <div class="row mt-3">
                     <div class="col-lg-2">
@@ -117,7 +117,7 @@
                 return (currentHour < 11) ? (count / 1.7) : (count / 2.0);
             }).reduce((sum, num) => sum + num, 0);
         
-        document.getElementById("countText").textContent = "Approximately " + patronCount + " patrons in James A. Gibson.";
+        document.getElementById("countText").textContent = "Approximately " + Math.round(patronCount) + " patrons in James A. Gibson Library.";
 
         let dataMapped = jsonData.filter(e => (e["Floor"] != 3) && (e["Floor"] != 4) && (e["Floor"] != 11))
             .sort((o1, o2) => o2["Floor"] - o1["Floor"])
@@ -327,6 +327,12 @@
                 }
             }
         });
+    </script>
+
+    <script type="text/javascript">
+        window.setTimeout(function () {
+            window.location.reload();
+        }, 300000);
     </script>
 </body>
 
