@@ -261,11 +261,11 @@
                                 capacityPercentage = Math.round(val.ratio * 100);
                                 capacityPercentageText = capacityPercentage + "%";
                                 
-                                // if (capacityPercentage == 9) {
-                                //     capacityPercentageText = ", at less than 10% capacity";
-                                // } else if (capacityPercentage === 96) {
-                                //     capacityPercentageText = ", at greater than 95% capacity";
-                                // }
+                                if (capacityPercentage < 10) {
+                                    capacityPercentageText = "< 10%";
+                                } else if (capacityPercentage > 95) {
+                                    capacityPercentageText = "> 95%";
+                                }
 
                                 // let label = "Very busy" + capacityPercentageText;
 
