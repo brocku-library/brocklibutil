@@ -13,6 +13,12 @@ import json
 
 urllib3.disable_warnings()
 
+WIFI_DATASET_FLOOR_COLUMN = "field_131"
+WIFI_DATASET_COUNT_COLUMN = "field_132"
+PATRON_DATASET_FLOOR_COLUMN = "field_138"
+PATRON_DATASET_COUNT_COLUMN = "field_139"
+TIMESTAMP_COLUMN = "ts_start"
+
 def check_match(location, building, floor):
     regex = re.compile(r"([A-Z]+)([0-9]?[0-9])([0-9][0-9])([A-Z]?)[-](.*)")
     match = regex.match(location)
@@ -90,6 +96,7 @@ def fetch(xmlData: dict, building="", floor=""):
 def fetchByRoom(xmlData: dict, room:str=""):
     return sum([v["count"] for (k , v) in xmlData.items() if v["name"].startswith(room)])
 
+
 if __name__ == "__main__":
     xml_data = get_xml_data()
     
@@ -107,16 +114,16 @@ if __name__ == "__main__":
         count = fetch(xml_data, "ST", str(floor))
         
         dataWiFi = {
-            "field_131": floor_str,
-            "field_132": count,
-            "ts_start": time
+            WIFI_DATASET_FLOOR_COLUMN: floor_str,
+            WIFI_DATASET_COUNT_COLUMN: count,
+            TIMESTAMP_COLUMN: time
         }
         floor_data_wifi.append(dataWiFi)
 
         dataPatron = {
-            "field_138": floor_str,
-            "field_139": count // div_factor,
-            "ts_start": time
+            PATRON_DATASET_FLOOR_COLUMN: floor_str,
+            PATRON_DATASET_COUNT_COLUMN: count // div_factor,
+            TIMESTAMP_COLUMN: time
         }
         floor_data_patron.append(dataPatron)
 
@@ -124,45 +131,45 @@ if __name__ == "__main__":
     count = fetchByRoom(xml_data, "ST225")
     
     floor_data_wifi.append({
-        "field_131": "2",
-        "field_132": count,
-        "ts_start": time
+        WIFI_DATASET_FLOOR_COLUMN: "2",
+        WIFI_DATASET_COUNT_COLUMN: count,
+        TIMESTAMP_COLUMN: time
     })
 
     floor_data_patron.append({
-        "field_138": "2",
-        "field_139": count // div_factor,
-        "ts_start": time
+        PATRON_DATASET_FLOOR_COLUMN: "2",
+        PATRON_DATASET_COUNT_COLUMN: count // div_factor,
+        TIMESTAMP_COLUMN: time
     })
     
     # add Makerspace data
     count = fetchByRoom(xml_data, "RFP204")
 
     floor_data_wifi.append({
-        "field_131": "20",
-        "field_132": count,
-        "ts_start": time
+        WIFI_DATASET_FLOOR_COLUMN: "20",
+        WIFI_DATASET_COUNT_COLUMN: count,
+        TIMESTAMP_COLUMN: time
     })
 
     floor_data_patron.append({
-        "field_138": "20",
-        "field_139": count // div_factor,
-        "ts_start": time
+        PATRON_DATASET_FLOOR_COLUMN: "20",
+        PATRON_DATASET_COUNT_COLUMN: count // div_factor,
+        TIMESTAMP_COLUMN: time
     })
         
     # add MDGL data
     count = fetchByRoom(xml_data, "MCC306-1B")
     
     floor_data_wifi.append({
-        "field_131": "30",
-        "field_132": count,
-        "ts_start": time
+        WIFI_DATASET_FLOOR_COLUMN: "30",
+        WIFI_DATASET_COUNT_COLUMN: count,
+        TIMESTAMP_COLUMN: time
     })
 
     floor_data_patron.append({
-        "field_138": "30",
-        "field_139": count // div_factor,
-        "ts_start": time
+        PATRON_DATASET_FLOOR_COLUMN: "30",
+        PATRON_DATASET_COUNT_COLUMN: count // div_factor,
+        TIMESTAMP_COLUMN: time
     })
     
     # get access token
@@ -189,8 +196,11 @@ if __name__ == "__main__":
         "Authorization": "Bearer " + token
     }
 
+    # Populating the patron count dataset only once in an hour
+    if datetime.now().minute < 10:
+        response = requests.post(store_data_url_patron, headers=headers, json=floor_data_patron)
+    
     response = requests.post(store_data_url_wifi, headers=headers, json=floor_data_wifi)
-    response = requests.post(store_data_url_patron, headers=headers, json=floor_data_patron)
 
     # Pushing the data to LibUtils backend directly, instead of relying on LibInsight, since LibInsight often responds with stale data.
     response = requests.post("http://rtod.library.brocku.ca:32777/busylib", data= {"jsonString": json.dumps(floor_data_wifi)})
