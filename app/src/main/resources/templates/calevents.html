@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -8,16 +9,22 @@
     <link rel="icon" th:href="@{/icons/clipboard-regular.svg}">
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" crossorigin="anonymous">
     <style>
+        .classroom-status {
+            display: inline-block;
+            padding: 0.3rem 1rem 0.5rem 1rem;
+            font-size: 3em;
+        }
+
         .tight-wrapped-alert {
             display: inline-block;
-            padding: 0.2rem;
+            padding: 0.3em;
         }
     </style>
 </head>
 
 <body>
-    <div class="container h-100">
-        <div class="row align-items-center h-100">
+    <div class="container vh-100">
+        <div class="row align-items-center vh-100">
             <div class="d-flex flex-column">
                 <div th:each="locationInfo, iter: ${allLocationInfos}">
                     <div th:if="${iter.index != 0}" style="padding: 20px;">
@@ -31,9 +38,9 @@
                     <div class="row">
                         <div th:class="${locationInfo.location.qrCodeURI != null ? 'col-9' : 'col-12'}">
                             <div class="p-2 text-center" th:switch="${locationInfo.runningEvent == null}">
-                                <h5 th:case="true" th:class="${locationInfo.location.qrCodeURI == null ? 'alert alert-success tight-wrapped-alert' : 'alert alert-success'}">Room is available right now</h5>
-                                <h5 th:case="false" th:class="${locationInfo.location.qrCodeURI == null ? 'alert alert-danger tight-wrapped-alert' : 'alert alert-danger'}">Reserved until
-                                    <strong>[(${locationInfo.runningEvent.endDateTimeStr})]</strong></h5>
+                                <h4 th:case="true" th:class="${locationInfo.location.qrCodeURI == null ? 'alert alert-success classroom-status' : 'alert alert-success'}">Room is available right now</h4>
+                                <h4 th:case="false" th:class="${locationInfo.location.qrCodeURI == null ? 'alert alert-danger classroom-status' : 'alert alert-danger'}">Reserved until
+                                    <strong>[(${locationInfo.runningEvent.endDateTimeStr})]</strong></h4>
                             </div>
 
                             <div class="p-2 text-center" th:if="${locationInfo.exactNextEvent != null}">
@@ -53,13 +60,15 @@
                                     <div class="col-md-6">
                                         <table class="table" th:if="${not #lists.isEmpty(locationInfo.upcomingEvents)}">
                                             <thead>
-                                                <th class="text-center h6">Starts at</th>
-                                                <th class="text-center h6">Ends at</th>
+                                                <tr>
+                                                    <th class="text-center">Starts at</th>
+                                                    <th class="text-center">Ends at</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
                                                 <tr th:each="event: ${locationInfo.upcomingEvents}">
-                                                    <td th:text="${event.startDateTimeStr}" class="text-center h6"></td>
-                                                    <td th:text="${event.endDateTimeStr}" class="text-center h6"></td>
+                                                    <td th:text="${event.startDateTimeStr}" class="text-center"></td>
+                                                    <td th:text="${event.endDateTimeStr}" class="text-center"></td>
                                                 </tr>
                                             </tbody>
                                         </table>
